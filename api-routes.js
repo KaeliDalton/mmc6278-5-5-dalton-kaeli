@@ -3,14 +3,6 @@ const db = require('./db')
 
 router
   .route('/inventory')
-  .get(async (req, res)=>{
-    try{
-      const [rows] = await db.query(`SELECT * FROM inventory`)
-      res.json(rows)
-    } catch (err){
-      res.status(500).send('Error retreiving inventory: ' + err.message)
-    }
-  })
   // TODO: Create a GET route that returns a list of everything in the inventory table
   // The response should look like:
   // [
@@ -25,6 +17,14 @@ router
   //   {...},
   //   {...}, etc
   // ]
+  .get(async (req, res)=>{
+    try{
+      const [rows] = await db.query(`SELECT * FROM inventory`)
+      res.json(rows)
+    } catch (err){
+      res.status(500).send('Error retreiving inventory: ' + err.message)
+    }
+  })
 
   // TODO: Create a POST route that inserts inventory items
   // This route will accept price, quantity, name, image, and description as JSON
@@ -62,16 +62,6 @@ router
   // TODO: Write a GET route that returns a single item from the inventory
   // that matches the id from the route parameter
   // Should return 404 if no item is found
-  .get(async (req, res) =>{
-    try{
-      const [{affectedRows}] = await db.query(`SELECT * FROM inventory WHERE id = ?`,
-      [req.params.id])
-      res.json(id.body)
-      res.status(200)
-    } catch(err) {
-      res.status(404).send('Item Not Found')
-    }
-  })
   // The response should look like:
   // {
   //   "id": 1,
@@ -81,6 +71,17 @@ router
   //   "price": 599.99,
   //   "quantity": 3
   // }
+  .get(async (req, res) =>{
+    try{
+      const [rows] = await db.query(`SELECT * FROM inventory WHERE id = ?`,
+      [req.params.id])
+      if (!rows[0]) return res.status(404).send('Item Not Found')
+      res.json(rows[0])
+      res.status(200)
+  } catch (err) {
+    res.status(500).send('Error getting inventory: ' + err.message)
+    }
+  })
 
   // TODO: Create a PUT route that updates the inventory table based on the id
   // in the route parameter.
